@@ -1,0 +1,76 @@
+1. Crear el Banner de Cookies en HTML/CSS
+Primero, necesitas diseñar el banner de cookies y colocarlo en el footer de tu página HTML. Aquí tienes un ejemplo básico de cómo podría verse:
+
+html
+Copy code
+<!-- En tu archivo HTML -->
+<footer>
+    <!-- Banner de Cookies -->
+    <div id="cookieBanner" style="display: none;">
+        <p>Este sitio utiliza cookies. ¿Qué deseas hacer?</p>
+        <button id="rejectCookies">Prohibir Cookies</button>
+        <button id="acceptCookies">Aceptar y Cerrar</button>
+    </div>
+</footer>
+Y en tu CSS, puedes agregar estilos para hacerlo visible e interactivo.
+
+2. Mostrar/Ocultar el Banner con JavaScript
+Usa JavaScript para controlar la visualización del banner. Por ejemplo, podrías mostrar el banner cuando la página se carga por primera vez y el usuario no ha tomado una decisión sobre las cookies.
+
+javascript
+Copy code
+window.onload = function() {
+    // Verificar si ya se tomó una decisión sobre las cookies
+    if (!localStorage.getItem('cookieDecision')) {
+        document.getElementById('cookieBanner').style.display = 'block';
+    }
+};
+
+document.getElementById('acceptCookies').onclick = function() {
+    localStorage.setItem('cookieDecision', 'accepted');
+    document.getElementById('cookieBanner').style.display = 'none';
+    // Aquí puedes guardar la decisión en la información del usuario si está autenticado
+};
+
+document.getElementById('rejectCookies').onclick = function() {
+    localStorage.setItem('cookieDecision', 'rejected');
+    window.location.href = 'https://google.com';
+};
+3. Manejar la Decisión del Usuario
+Cuando el usuario acepta o rechaza las cookies, debes manejar su decisión. En el código JavaScript anterior, se utiliza localStorage para recordar la decisión del usuario. Si rechaza las cookies, el usuario es redirigido a Google.
+
+4. Integración con la Autenticación del Usuario
+Para recordar la decisión sobre las cookies en relación con un usuario autenticado, necesitas una lógica en tu backend de Node.js. Esto podría implicar:
+
+Al aceptar las cookies, envía una solicitud AJAX al servidor.
+En el servidor, actualiza la información del usuario en la base de datos para reflejar su decisión sobre las cookies.
+En visitas futuras, verifica esta información y muestra u oculta el banner de cookies según sea necesario.
+Aquí tienes un ejemplo de cómo podría ser una solicitud AJAX para actualizar la preferencia de cookies:
+
+javascript
+Copy code
+// Enviar solicitud al servidor cuando el usuario acepta cookies
+document.getElementById('acceptCookies').onclick = function() {
+    fetch('/updateCookiePreference', {
+        method: 'POST',
+        body: JSON.stringify({cookiePreference: 'accepted'}),
+        headers: {'Content-Type': 'application/json'}
+    }).then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              localStorage.setItem('cookieDecision', 'accepted');
+              document.getElementById('cookieBanner').style.display = 'none';
+          }
+    });
+};
+En tu servidor Node.js, tendrías un endpoint para manejar esta solicitud, algo así:
+
+javascript
+Copy code
+app.post('/updateCookiePreference', (req, res) => {
+    const userPreference = req.body.cookiePreference;
+    // Aquí actualizas la base de datos del usuario con su preferencia
+    // ...
+    res.json({success: true});
+});
+Recuerda que este es solo un ejemplo y puede necesitar ajustes según tu configuración exacta y necesidades de tu aplicación.
